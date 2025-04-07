@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import torch
 from pathlib import Path
 from torch.utils.data import DataLoader
@@ -13,7 +14,7 @@ from tqdm import tqdm
 from generator import Generator
 from discriminator import Discriminator
 
-class Pix2PixTrainer:
+class Pix2PixTrain:
     def __init__(self):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.setup_directories()
@@ -21,8 +22,9 @@ class Pix2PixTrainer:
         self.batch_size = 4
         self.img_dim = 512
         self.lr = 2e-4
-        self.l1_lambda = 100
+        self.l1_lambda = 200
         self.checkpoint_interval = 100
+        #self.num_epochs = 10
         
         self.init_models()
         self.init_data()
@@ -43,7 +45,7 @@ class Pix2PixTrainer:
 
     def init_data(self):
         transform = transforms.Compose([
-            transforms.Resize(self.img_dim),
+            #transforms.Resize(self.img_dim),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
@@ -51,17 +53,25 @@ class Pix2PixTrainer:
         dataset = self.create_dataset(transform)
         self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
-    def create_dataset(self, transform):
+    def create_dataset(self):
         class PairedDataset(torch.utils.data.Dataset):
-            def __init__(self, processed_dir):
-                self.pair_files = sorted(Path(processed_dir).glob("*.npz"))
-                
-            def __getitem__(self, idx):
-                data = np.load(self.pair_files[idx])
-                return torch.tensor(data['input']), torch.tensor(data['target'])
+            def __init__(self, data_dir):
+                self.files = sorted(Path(data_dir).glob("*.npz"))
 
-        
+            def __len__(self):
+                return len(self.files)
+
+            def __getitem__(self, idx):
+                data = np.load(self.files[idx])
+                
+                # Convert HWC -> CHW and normalize to [-1, 1]
+                input_img = torch.tensor(data['input']).permute(2, 0, 1).float() / 127.5 - 1
+                target_img = torch.tensor(data['target']).permute(2, 0, 1).float() / 127.5 - 1
+                
+                return input_img, target_img
+
         return PairedDataset(self.data_dir)
+
 
     def train(self, num_epochs):
         opt_gen = optim.Adam(self.gen.parameters(), lr=self.lr, betas=(0.5, 0.999))
@@ -73,7 +83,7 @@ class Pix2PixTrainer:
             for batch_idx, (input_img, target_img) in enumerate(loop):
                 input_img, target_img = input_img.to(self.device), target_img.to(self.device)
                 
-                # Discriminator training
+                # Discriminator step
                 fake_img = self.gen(input_img)
                 disc_real = self.disc(input_img, target_img)
                 disc_fake = self.disc(input_img, fake_img.detach())
@@ -84,7 +94,7 @@ class Pix2PixTrainer:
                 loss_disc.backward()
                 opt_disc.step()
 
-                # Generator training
+                # Generator step
                 disc_fake = self.disc(input_img, fake_img)
                 loss_gen = bce(disc_fake, torch.ones_like(disc_fake)) + l1_loss(fake_img, target_img)*self.l1_lambda
                 
@@ -92,11 +102,11 @@ class Pix2PixTrainer:
                 loss_gen.backward()
                 opt_gen.step()
 
-                # Logging
+                # Logging in tensorboard every 100 batcches(im using this to view loss)(port 6006)
                 if batch_idx % 100 == 0:
                     self.log_tensorboard(input_img, target_img, fake_img, epoch, batch_idx)
                     
-                if batch_idx % self.checkpoint_interval == 0 or batch_idx==len(self.loader)-1:
+                if batch_idx % self.checkpoint_interval == 0 or batch_idx==len(self.load):
                     self.save_checkpoint()
 
     def log_tensorboard(self, input_img, target_img, fake_img, epoch, batch_idx):
@@ -105,12 +115,11 @@ class Pix2PixTrainer:
         fake_img = (fake_img * 0.5 + 0.5)
         target_img = (target_img * 0.5 + 0.5)
         
-        # Create grids
         input_grid = make_grid(input_img[:4], nrow=2, normalize=True)
         fake_grid = make_grid(fake_img[:4], nrow=2, normalize=True)
         target_grid = make_grid(target_img[:4], nrow=2, normalize=True)
         
-        # Write to TensorBoard
+        # TensorBoard(the actual images once every 100 batches)
         self.writer.add_image("Input", input_grid, global_step=epoch*len(self.loader)+batch_idx)
         self.writer.add_image("Fake", fake_grid, global_step=epoch*len(self.loader)+batch_idx)
         self.writer.add_image("Target", target_grid, global_step=epoch*len(self.loader)+batch_idx)
@@ -124,5 +133,5 @@ class Pix2PixTrainer:
         self.disc.load_state_dict(torch.load(self.ckpt_dir/"discriminator.pth"))
 
 if __name__ == "__main__":
-    trainer = Pix2PixTrainer()
-    trainer.train(num_epochs=100)  # Start with 100 epochs
+    trainer = Pix2PixTrain()
+    trainer.train(num_epochs=10)
