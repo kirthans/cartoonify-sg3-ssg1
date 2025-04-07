@@ -96,7 +96,7 @@ class Pix2PixTrainer:
                 if batch_idx % 100 == 0:
                     self.log_tensorboard(input_img, target_img, fake_img, epoch, batch_idx)
                     
-                if batch_idx % self.checkpoint_interval == 0:
+                if batch_idx % self.checkpoint_interval == 0 or batch_idx==len(self.loader)-1:
                     self.save_checkpoint()
 
     def log_tensorboard(self, input_img, target_img, fake_img, epoch, batch_idx):
