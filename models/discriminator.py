@@ -30,7 +30,7 @@ class conv_block(nn.Module):
         return self.l1(x)
 
 class Discriminator(nn.Module):
-    def __init__(self, img_channels, features):
+    def __init__(self, img_channels, features=64):
         super(Discriminator, self).__init__()
         self.img_channels = img_channels
         self.features = features
