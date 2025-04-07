@@ -132,6 +132,7 @@ class Pix2PixTrain:
         self.gen.load_state_dict(torch.load(self.ckpt_dir/"generator.pth"))
         self.disc.load_state_dict(torch.load(self.ckpt_dir/"discriminator.pth"))
 
-if __name__ == "__main__":
+'''if __name__ == "__main__":
     trainer = Pix2PixTrain()
     trainer.train(num_epochs=10)
+'''
