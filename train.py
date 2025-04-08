@@ -33,9 +33,9 @@ class Pix2PixTrain:
         self.writer = SummaryWriter(self.log_dir)
 
     def setup_directories(self):
-        self.data_dir = Path(r"kaggle/working/processed_data")
-        self.log_dir = Path(r"kaggle/working/logs")
-        self.ckpt_dir = Path(r"kaggle/working/checkpoints")
+        self.data_dir = Path(r"/kaggle/working/processed_data")
+        self.log_dir = Path(r"/kaggle/working/logs")
+        self.ckpt_dir = Path(r"/kaggle/working/checkpoints")
         self.ckpt_dir.mkdir(exist_ok=True)
 
     def init_models(self):
