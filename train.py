@@ -31,26 +31,26 @@ class Pix2PixTrain:
         self.writer = SummaryWriter(self.log_dir)
 
     def setup_directories(self):
-        self.data_dir = Path("/kaggle/input/your-dataset-name")
-        self.log_dir = Path("/kaggle/working/logs")
-        self.ckpt_dir = Path("/kaggle/working/checkpoints")
+        self.data_dir = Path(r"C:/Users/Rama/Desktop/dc/cartoonify/processed_data_256")
+        self.log_dir = Path(r"C:/Users/Rama/Desktop/dc/cartoonify/working/logs")
+        self.ckpt_dir = Path(r"C:/Users/Rama/Desktop/dc/cartoonify/working/checkpoints")
         self.ckpt_dir.mkdir(exist_ok=True)
 
     def init_models(self):
-        self.gen = Generator(img_channels=3).to(self.device)
-        self.disc = Discriminator(img_channels=3).to(self.device)
+        self.gen = Generator(img_channels=3, features=maps_gen).to(self.device)
+        self.disc = Discriminator(img_channels=3, features = maps_disc).to(self.device)
         
         if (self.ckpt_dir/"generator.pth").exists():
             self.load_checkpoint()
 
     def init_data(self):
         transform = transforms.Compose([
-            #transforms.Resize(self.img_dim),
+           #transforms.Resize(self.img_dim),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
         
-        dataset = self.create_dataset(transform)
+        dataset = self.create_dataset()
         self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
     def create_dataset(self):
@@ -102,11 +102,11 @@ class Pix2PixTrain:
                 loss_gen.backward()
                 opt_gen.step()
 
-                # Logging in tensorboard every 100 batcches(im using this to view loss)(port 6006)
+                # Logging in tensorboard every 100 batches(im using this to view loss)(port 6006)
                 if batch_idx % 100 == 0:
                     self.log_tensorboard(input_img, target_img, fake_img, epoch, batch_idx)
                     
-                if batch_idx % self.checkpoint_interval == 0 or batch_idx==len(self.load):
+                if batch_idx % self.checkpoint_interval == 0 or batch_idx==len(self.loader):
                     self.save_checkpoint()
 
     def log_tensorboard(self, input_img, target_img, fake_img, epoch, batch_idx):
@@ -132,7 +132,10 @@ class Pix2PixTrain:
         self.gen.load_state_dict(torch.load(self.ckpt_dir/"generator.pth"))
         self.disc.load_state_dict(torch.load(self.ckpt_dir/"discriminator.pth"))
 
-'''if __name__ == "__main__":
+maps_gen = 64
+maps_disc = 64
+print(f'Using device : {torch.device}')
+if __name__ == "__main__":
     trainer = Pix2PixTrain()
     trainer.train(num_epochs=10)
-'''
+    
