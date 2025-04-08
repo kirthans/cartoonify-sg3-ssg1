@@ -81,6 +81,7 @@ class Pix2PixTrain:
         bce, l1_loss = nn.BCEWithLogitsLoss(), nn.L1Loss()
 
         for epoch in range(num_epochs):
+            print(f'Epoch: {epoch}')
             loop = tqdm(self.loader, leave=True)
             for batch_idx, (input_img, target_img) in enumerate(loop):
                 input_img, target_img = input_img.to(self.device), target_img.to(self.device)
