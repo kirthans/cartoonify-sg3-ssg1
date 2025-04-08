@@ -9,6 +9,8 @@ from torchvision import transforms
 import torch.nn as nn
 from torch import optim
 from tqdm import tqdm
+import sys
+sys.path.append('models')
 
 
 from generator import Generator
@@ -21,7 +23,7 @@ class Pix2PixTrain:
         
         self.batch_size = 4
         self.img_dim = 512
-        self.lr = 2e-4
+        self.lr = 3e-4
         self.l1_lambda = 200
         self.checkpoint_interval = 100
         #self.num_epochs = 10
@@ -31,9 +33,9 @@ class Pix2PixTrain:
         self.writer = SummaryWriter(self.log_dir)
 
     def setup_directories(self):
-        self.data_dir = Path(r"C:/Users/Rama/Desktop/dc/cartoonify/processed_data_256")
-        self.log_dir = Path(r"C:/Users/Rama/Desktop/dc/cartoonify/working/logs")
-        self.ckpt_dir = Path(r"C:/Users/Rama/Desktop/dc/cartoonify/working/checkpoints")
+        self.data_dir = Path(r"kaggle/working/processed_data")
+        self.log_dir = Path(r"kaggle/working/logs")
+        self.ckpt_dir = Path(r"kaggle/working/checkpoints")
         self.ckpt_dir.mkdir(exist_ok=True)
 
     def init_models(self):
@@ -138,4 +140,3 @@ print(f'Using device : {torch.device}')
 if __name__ == "__main__":
     trainer = Pix2PixTrain()
     trainer.train(num_epochs=10)
-    
