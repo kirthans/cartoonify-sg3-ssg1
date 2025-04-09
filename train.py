@@ -24,7 +24,7 @@ class Pix2PixTrain:
         self.batch_size = 4
         self.img_dim = 512
         self.lr = 3e-4
-        self.l1_lambda = 200
+        self.l1_lambda = 50
         self.checkpoint_interval = 100
         #self.num_epochs = 10
         
