@@ -1,0 +1,5 @@
+torch>=1.9.0  # PyTorch
+torchvision>=0.10.0  # PyTorch Vision (datasets, transforms)
+tensorboard>=2.4.0  # TensorBoard for logging
+numpy>=1.21.0  # NumPy for use with cv2
+opencv-python-headless>=4.5.0  # OpenCV for Image PostProcessing
