@@ -4,7 +4,7 @@ import numpy as np
 from pathlib import Path
 #import kagglehub
 
-'''os.environ["KAGGLEHUB_CACHE"] = r"C:/Users/Rama/Desktop/dc/cartoonify/data"
+'''os.environ["KAGGLEHUB_CACHE"] = r"C:/Users/User/Desktop/dc/cartoonify/data"
 path = kagglehub.dataset_download("defileroff/comic-faces-paired-synthetic")
 print("Path to dataset files:", path)
 '''
@@ -47,11 +47,11 @@ def preprocess_images(input_dir, target_dir, output_dir, target_size=256):
 if __name__ == "__main__":
     try:
         preprocess_images(
-            input_dir=r"C:/Users/Rama/Desktop/dc/cartoonify/data/datasets/defileroff/comic-faces-paired-synthetic/versions/1/face2comics_v1.0.0_by_Sxela/face2comics_v1.0.0_by_Sxela/face",
-            target_dir=r"C:/Users/Rama/Desktop/dc/cartoonify/data/datasets/defileroff/comic-faces-paired-synthetic/versions/1/face2comics_v1.0.0_by_Sxela/face2comics_v1.0.0_by_Sxela/comics",
-            output_dir=r"C:/Users/Rama/Desktop/dc/cartoonify/processed_data_256",
+            input_dir=r"kaggle/defileroff/comic-faces-paired-synthetic/versions/1/face2comics_v1.0.0_by_Sxela/face2comics_v1.0.0_by_Sxela/face",
+            target_dir=r"kaggle/defileroff/comic-faces-paired-synthetic/versions/1/face2comics_v1.0.0_by_Sxela/face2comics_v1.0.0_by_Sxela/comics",
+            output_dir=r"kaggle/working/processed_data_512",
 
-            target_size=256
+            target_size=512
         )
     except Exception as e:
         print(f"Error: {e}")
