@@ -47,8 +47,8 @@ def preprocess_images(input_dir, target_dir, output_dir, target_size=256):
 if __name__ == "__main__":
     try:
         preprocess_images(
-            input_dir=r"kaggle/defileroff/comic-faces-paired-synthetic/versions/1/face2comics_v1.0.0_by_Sxela/face2comics_v1.0.0_by_Sxela/face",
-            target_dir=r"kaggle/defileroff/comic-faces-paired-synthetic/versions/1/face2comics_v1.0.0_by_Sxela/face2comics_v1.0.0_by_Sxela/comics",
+            input_dir=r"/kaggle/input/comic-faces-paired-synthetic/face2comics_v1.0.0_by_Sxela/face2comics_v1.0.0_by_Sxela/face",
+            target_dir=r"/kaggle/input/comic-faces-paired-synthetic/face2comics_v1.0.0_by_Sxela/face2comics_v1.0.0_by_Sxela/comics",
             output_dir=r"kaggle/working/processed_data_512",
 
             target_size=512
